@@ -1,16 +1,9 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace GlobalExceptionHandling.WebApi
 {
@@ -26,7 +19,6 @@ namespace GlobalExceptionHandling.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -39,7 +31,6 @@ namespace GlobalExceptionHandling.WebApi
         {
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "GlobalExceptionHandling.WebApi v1"));
             }
@@ -49,7 +40,24 @@ namespace GlobalExceptionHandling.WebApi
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseMiddleware<ErrorHandlerMiddleware>();
+            //app.UseExceptionHandler(
+            //    options =>
+            //    {
+            //        options.Run(
+            //            async context =>
+            //            {
+            //                context.Response.StatusCode = (int)HttpStatusCode.BadRequest;
+            //                context.Response.ContentType = "text/html";
+            //                var exceptionObject = context.Features.Get<IExceptionHandlerFeature>();
+            //                if (null != exceptionObject)
+            //                {
+            //                    var errorMessage = $"{exceptionObject.Error.Message}";
+            //                    await context.Response.WriteAsync(errorMessage).ConfigureAwait(false);
+            //                }
+            //            });
+            //    }
+            //);
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
